@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"  # Change to the directory of the script
+cd script_files
+python3 ui.py
