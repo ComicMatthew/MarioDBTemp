@@ -2,6 +2,7 @@ import os
 import json
 import tkinter as tk
 from tkinter import messagebox
+import shutil
 
 
 def show_alert(title, message):

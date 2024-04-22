@@ -93,7 +93,7 @@ entry_done_folder_path = tk.Entry(root)
 entry_done_folder_path.insert(0, done_folder_path)
 
 label_usage_worksheet = tk.Label(
-    root, text="Nazwa skoroszytu do zrodlowego")
+    root, text="Nazwa skoroszytu pliku Odejmowanie/Dodawanie")
 entry_usage_worksheet = tk.Entry(root)
 entry_usage_worksheet.insert(0, usage_worksheet)
 

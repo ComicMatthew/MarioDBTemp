@@ -27,8 +27,8 @@ temp = '.\\temp' if sys.platform.startswith('win') else './temp'
 def find_missing_records(database_path, usage_path):
     try:
         database_wb = openpyxl.load_workbook(database_path)
-        todo_file_path, todo_file_name = get_used_file(usage_path)
-        usage_wb = openpyxl.load_workbook(todo_file_path)
+       
+        usage_wb = openpyxl.load_workbook(usage_path)
 
         database_sheet = database_wb[usage_workdatasheet]
         usage_sheet = usage_wb[usage_worksheet]
@@ -48,15 +48,18 @@ def find_missing_records(database_path, usage_path):
             if not asset_found and asset_name is not None:
                 missing_records.append(asset_name)
         print(
-            f"Tych elementow nie ma w pliku magazynowym: {missing_records} a sa dostepne w pliku: {todo_file_name}")
+            f"Tych elementow nie ma w pliku magazynowym: {missing_records} a sa dostepne w pliku: {usage_path}")
     except KeyError as e:
         print(f"Error: {e}")
         show_alert(
             "Skoroszyt Excela nie nazywa sie 'Materialliste'", f"{str(e)}")
+        shutil.move(usage_path, usage_subtraction_file_path)
     except FileNotFoundError as e:
         show_alert("Brakuje pliku", f"{str(e)}")
+        shutil.move(usage_path, usage_subtraction_file_path)
     except PermissionError as e:
         show_alert("Excel jest wciaz otwarty", f"{e}")
+        shutil.move(usage_path, usage_subtraction_file_path)
 
 
 def update_quantities(database_path, usage_path, done_folder_path, temp):
@@ -65,6 +68,7 @@ def update_quantities(database_path, usage_path, done_folder_path, temp):
         todo_file_path, todo_file_name = get_used_file(usage_path)
         shutil.move(todo_file_path, temp)
         todo_file_path_temp = os.path.join(temp, todo_file_name)
+        find_missing_records(database_path, todo_file_path_temp)
         usage_wb = openpyxl.load_workbook(todo_file_path_temp)
         # usage_wb = openpyxl.load_workbook(usage_path)
 
@@ -120,29 +124,36 @@ def update_quantities(database_path, usage_path, done_folder_path, temp):
             print(f"Error: {e}")
             show_alert("Ograniczony dostep do pliku",
                        f"Baza danych nie zostala zapisana, gdyz dostep byl ograniczony. Prawdopodobnie Excel z baza danych jest otwarty. {str(e)}. Plik NIE zostal zapisany. Zamknij go i odpal skrypt ponownie")
+            shutil.move(todo_file_path_temp, usage_subtraction_file_path)
         except TypeError as e:
-            show_alert("W excelu nie bylo podanych numerow", f" {e}")
+            show_alert("W plikach istnieja miary ze zylm separatorem (przecinek, badz kropka): {e}")
+            shutil.move(todo_file_path_temp, usage_subtraction_file_path)
     except shutil.Error as e:
         print(f"Error: {e}")
         show_alert("W Folderze istnieje juz plik o tej nazwie",
                    f"Baza danych Zostala zaktualizowana, wiec musisz tylko przeniesc plik do folderu '{done_file_path}': {str(e)}")
+        shutil.move(todo_file_path_temp, usage_subtraction_file_path)
     except KeyError as e:
         print(f"Error: {e}")
         show_alert(
             "Skoroszyt Excela nie nazywa sie 'Materialliste'", f"{str(e)}")
+        shutil.move(todo_file_path_temp, usage_subtraction_file_path)
     except TypeError as e:
         show_alert("W excelu nie bylo podanych numerow",
-                   f"W pliku istnieja metry i nie policzylem: {e}")
+                   f"W plikach istnieja miary ze zylm separatorem (przecinek, badz kropka): {e}")
+        shutil.move(todo_file_path_temp, usage_subtraction_file_path)
     except PermissionError as e:
             print(f"Error: {e}")
             show_alert("Ograniczony dostep do pliku",
                        f"Baza danych nie zostala zapisana, gdyz dostep byl ograniczony. Prawdopodobnie Excel z baza danych jest otwarty. {str(e)}. Plik NIE zostal zapisany. Zamknij go i odpal skrypt ponownie")
+            shutil.move(todo_file_path_temp, usage_subtraction_file_path)
+
 
 
 if __name__ == "__main__":
     print("Script starting")
     remove_folder_contents(temp)
-    find_missing_records(database_file_path, usage_subtraction_file_path)
+    #find_missing_records(database_file_path, usage_subtraction_file_path)
     update_quantities(database_file_path,
                       usage_subtraction_file_path, done_folder_path, temp)
     
