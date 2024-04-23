@@ -1,6 +1,6 @@
 {
     "database_file_path": "..\\Kostka Lagerplatz.xlsx",
-    "usage_subtraction_file_path": "..\\Zuzyty Material",
+    "usage_subtraction_file_path": "..\\Material do odejmowania",
     "usage_addition_file_path": "..\\Material do dodania",
     "done_folder_path": "..\\Gotowe",
     "usage_worksheet": "Materialliste",
